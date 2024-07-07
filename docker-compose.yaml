@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  social:
+    container_name: social
+    image: francesco/social:1.0.0
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - mailhog
+      - db
+      - db-test
+    environment:
+      XDEBUG_MODE: debug
+      XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+  db:
+    container_name: db
+    image: postgres:12
+    ports:
+      - "5452:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  db-test:
+    container_name: db-test
+    image: postgres:12
+    ports:
+      - "5472:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data: {}
